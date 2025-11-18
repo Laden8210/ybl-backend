@@ -7,6 +7,7 @@ use App\Http\Controllers\Admin\AssignmentController;
 use App\Http\Controllers\Admin\RouteController;
 use App\Http\Controllers\Admin\ScheduleController;
 use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\Admin\ProfileController;
 
 Route::get('/', function () {
     return view('landing');
@@ -20,7 +21,9 @@ Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 // Admin UI routes
 Route::prefix('admin')->name('admin.')->middleware(['auth','admin'])->group(function () {
     Route::view('/', 'admin.dashboard')->name('dashboard');
-    Route::view('/profile', 'admin.profile')->name('profile');
+    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile');
+    Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::put('/profile/password', [ProfileController::class, 'updatePassword'])->name('profile.password');
 
     // Buses
     Route::get('/buses', [BusController::class, 'index'])->name('buses.index');
