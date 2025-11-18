@@ -1,7 +1,7 @@
 @extends('layouts.admin')
 
-@section('title', 'Create Staff Account')
-@section('page_title', 'Create Staff Account')
+@section('title', 'Edit Staff Account')
+@section('page_title', 'Edit Staff Account')
 
 @section('content')
 <div class="container-fluid">
@@ -9,17 +9,18 @@
         <div class="col-md-12">
             <div class="card border-0 shadow-sm">
                 <div class="card-header bg-primary text-white">
-                    <h5 class="mb-0">Create New Staff Account</h5>
+                    <h5 class="mb-0">Edit Staff Account - {{ $staff->name }}</h5>
                 </div>
                 <div class="card-body">
-                    <form action="{{ route('admin.staff.store') }}" method="POST">
+                    <form action="{{ route('admin.staff.update', $staff) }}" method="POST">
                         @csrf
+                        @method('PUT')
 
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label for="name" class="form-label">Full Name <span class="text-danger">*</span></label>
                                 <input type="text" class="form-control @error('name') is-invalid @enderror"
-                                       id="name" name="name" value="{{ old('name') }}" required>
+                                       id="name" name="name" value="{{ old('name', $staff->name) }}" required>
                                 @error('name')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
@@ -28,7 +29,7 @@
                             <div class="col-md-6 mb-3">
                                 <label for="email" class="form-label">Email Address <span class="text-danger">*</span></label>
                                 <input type="email" class="form-control @error('email') is-invalid @enderror"
-                                       id="email" name="email" value="{{ old('email') }}" required>
+                                       id="email" name="email" value="{{ old('email', $staff->email) }}" required>
                                 @error('email')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
@@ -40,10 +41,9 @@
                                 <label for="role" class="form-label">Role <span class="text-danger">*</span></label>
                                 <select class="form-select @error('role') is-invalid @enderror"
                                         id="role" name="role" required>
-                                    <option value="">Select Role</option>
-                                    <option value="supervisor" {{ old('role') == 'supervisor' ? 'selected' : '' }}>Supervisor</option>
-                                    <option value="driver" {{ old('role') == 'driver' ? 'selected' : '' }}>Driver</option>
-                                    <option value="conductor" {{ old('role') == 'conductor' ? 'selected' : '' }}>Conductor</option>
+                                    <option value="supervisor" {{ old('role', $staff->role) == 'supervisor' ? 'selected' : '' }}>Supervisor</option>
+                                    <option value="driver" {{ old('role', $staff->role) == 'driver' ? 'selected' : '' }}>Driver</option>
+                                    <option value="conductor" {{ old('role', $staff->role) == 'conductor' ? 'selected' : '' }}>Conductor</option>
                                 </select>
                                 @error('role')
                                     <div class="invalid-feedback">{{ $message }}</div>
@@ -53,7 +53,7 @@
                             <div class="col-md-6 mb-3">
                                 <label for="employee_id" class="form-label">Employee ID <span class="text-danger">*</span></label>
                                 <input type="text" class="form-control @error('employee_id') is-invalid @enderror"
-                                       id="employee_id" name="employee_id" value="{{ old('employee_id') }}" required>
+                                       id="employee_id" name="employee_id" value="{{ old('employee_id', $staff->employee_id) }}" required>
                                 @error('employee_id')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
@@ -64,7 +64,7 @@
                             <div class="col-md-6 mb-3">
                                 <label for="phone" class="form-label">Phone Number</label>
                                 <input type="tel" class="form-control @error('phone') is-invalid @enderror"
-                                       id="phone" name="phone" value="{{ old('phone') }}">
+                                       id="phone" name="phone" value="{{ old('phone', $staff->phone) }}">
                                 @error('phone')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
@@ -73,7 +73,7 @@
                             <div class="col-md-6 mb-3">
                                 <label for="license_number" class="form-label">License Number</label>
                                 <input type="text" class="form-control @error('license_number') is-invalid @enderror"
-                                       id="license_number" name="license_number" value="{{ old('license_number') }}"
+                                       id="license_number" name="license_number" value="{{ old('license_number', $staff->license_number) }}"
                                        placeholder="Required for drivers only">
                                 @error('license_number')
                                     <div class="invalid-feedback">{{ $message }}</div>
@@ -84,7 +84,7 @@
                         <div class="mb-3">
                             <label for="address" class="form-label">Address</label>
                             <textarea class="form-control @error('address') is-invalid @enderror"
-                                      id="address" name="address" rows="3">{{ old('address') }}</textarea>
+                                      id="address" name="address" rows="3">{{ old('address', $staff->address) }}</textarea>
                             @error('address')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
@@ -92,18 +92,19 @@
 
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <label for="password" class="form-label">Password <span class="text-danger">*</span></label>
+                                <label for="password" class="form-label">Password</label>
                                 <input type="password" class="form-control @error('password') is-invalid @enderror"
-                                       id="password" name="password" required>
+                                       id="password" name="password" placeholder="Leave blank to keep current password">
                                 @error('password')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
                             </div>
 
                             <div class="col-md-6 mb-3">
-                                <label for="password_confirmation" class="form-label">Confirm Password <span class="text-danger">*</span></label>
+                                <label for="password_confirmation" class="form-label">Confirm Password</label>
                                 <input type="password" class="form-control"
-                                       id="password_confirmation" name="password_confirmation" required>
+                                       id="password_confirmation" name="password_confirmation"
+                                       placeholder="Confirm new password">
                             </div>
                         </div>
 
@@ -112,7 +113,7 @@
                                 <i class="bi bi-arrow-left me-1"></i> Back to List
                             </a>
                             <button type="submit" class="btn btn-primary">
-                                <i class="bi bi-plus-circle me-1"></i> Create Account
+                                <i class="bi bi-check-circle me-1"></i> Update Account
                             </button>
                         </div>
                     </form>

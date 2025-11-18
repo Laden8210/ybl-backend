@@ -118,7 +118,7 @@
 
     <div class="row">
         <div class="col-lg-12">
-            <div class="card border-0 shadow-sm over">
+            <div class="card border-0 shadow-sm">
                 <div class="card-header bg-secondary text-white">
                     <h5 class="mb-0"><i class="bi bi-list-check me-2"></i>Current Assignments</h5>
                 </div>
@@ -142,7 +142,7 @@
                                         <td class="px-4">{{ $index + 1 }}</td>
                                         <td>
                                             <div class="d-flex align-items-center">
-                                                <div class="avatar-sm bg-primary rounded-circle d-flex align-items-center justify-content-center me-3 px-2 py-1">
+                                                <div class="avatar-sm bg-primary rounded-circle d-flex align-items-center justify-content-center me-3">
                                                     <i class="bi bi-bus-front text-white"></i>
                                                 </div>
                                                 <div>
@@ -153,7 +153,7 @@
                                         </td>
                                         <td>
                                             <div class="d-flex align-items-center">
-                                                <div class="avatar-sm bg-info rounded-circle d-flex align-items-center justify-content-center me-2 px-2 py-1">
+                                                <div class="avatar-sm bg-info rounded-circle d-flex align-items-center justify-content-center me-2">
                                                     <i class="bi bi-person text-white"></i>
                                                 </div>
                                                 <div>
@@ -164,7 +164,7 @@
                                         </td>
                                         <td>
                                             <div class="d-flex align-items-center">
-                                                <div class="avatar-sm bg-warning rounded-circle d-flex align-items-center justify-content-center me-2 px-2 py-1">
+                                                <div class="avatar-sm bg-warning rounded-circle d-flex align-items-center justify-content-center me-2">
                                                     <i class="bi bi-person text-dark"></i>
                                                 </div>
                                                 <div>
@@ -206,7 +206,7 @@
                                                 </a>
 
                                                 <!-- Status Dropdown -->
-                                                <div class="dropdown dropdown-center">
+                                                <div class="dropdown">
                                                     <button class="btn btn-sm btn-outline-secondary dropdown-toggle"
                                                             type="button"
                                                             data-bs-toggle="dropdown"

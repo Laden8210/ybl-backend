@@ -5,7 +5,7 @@
     <div class="container py-5">
         <div class="row align-items-center g-5">
             <div class="col-lg-6">
-                <h1 class="display-5 fw-bold text-heading mb-3">Yellow Bus Line</h1>
+                <h1 class="display-5 fw-bold text-heading mb-3">Bus Dropping Point</h1>
                 <p class="lead text-secondary-body mb-4">Reliable, safe, and efficient public transport. Real-time GPS tracking, clear communication, and smooth drop-off coordination for everyone.</p>
                 <div class="d-flex gap-3">
                     <a href="{{ route('login') }}" class="btn btn-primary btn-lg">Login</a>
