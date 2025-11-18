@@ -57,6 +57,8 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/forward-drop-point/{dropPoint}', [ConductorController::class, 'forwardDropPoint']);
     });
 
+
+    
     // Passenger specific routes
     Route::prefix('passenger')->group(function () {
         Route::get('/routes', [PassengerController::class, 'getRoutes']);
