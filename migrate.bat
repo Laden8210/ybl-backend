@@ -1,4 +1,7 @@
 @echo off
-echo Migrating database...
-php artisan migrate --force
+echo Migrating database using SQL dump file...
+
+php import-dump.php
+
+echo Database migration completed!
 pause
