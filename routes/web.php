@@ -6,6 +6,7 @@ use App\Http\Controllers\Admin\BusController;
 use App\Http\Controllers\Admin\AssignmentController;
 use App\Http\Controllers\Admin\RouteController;
 use App\Http\Controllers\Admin\ScheduleController;
+use App\Http\Controllers\Auth\LoginController;
 
 Route::get('/', function () {
     return view('landing');
@@ -13,9 +14,11 @@ Route::get('/', function () {
 
 // Public login page (UI only)
 Route::view('/login', 'auth.login')->name('login');
+Route::post('/login', [LoginController::class, 'login'])->name('login.post');
+Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 
 // Admin UI routes
-Route::prefix('admin')->name('admin.')->group(function () {
+Route::prefix('admin')->name('admin.')->middleware(['auth','admin'])->group(function () {
     Route::view('/', 'admin.dashboard')->name('dashboard');
     Route::view('/profile', 'admin.profile')->name('profile');
 
@@ -67,3 +70,4 @@ Route::prefix('admin')->name('admin.')->group(function () {
     // Tracking
     Route::view('/tracking', 'admin.tracking.index')->name('tracking.index');
 });
+
