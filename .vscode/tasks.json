@@ -2,9 +2,9 @@
   "version": "2.0.0",
   "tasks": [
     {
-      "label": "Auto Pull and Dev",
+      "label": "Auto Run All",
       "type": "shell",
-      "command": ".\\pull.bat",
+      "command": ".\\run_all.bat",
       "options": {
         "cwd": "${workspaceFolder}"
       },
