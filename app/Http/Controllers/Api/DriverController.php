@@ -143,6 +143,44 @@ class DriverController extends Controller
         ]);
     }
 
+    public function createTrip(Request $request)
+    {
+
+        $user = $request->user();
+
+        if (!$user->isDriver()) {
+            return response()->json([
+                'message' => 'Access denied. Driver role required.'
+            ], 403);
+        }
+
+        $request->validate([
+            'schedule_id' => 'required|exists:schedules,id',
+            'bus_id' => 'required|exists:buses,id',
+        ]);
+
+        $trip = Trip::create([
+            'schedule_id' => $request->schedule_id,
+            'bus_assignment_id' => $request->bus_id,
+            'trip_date' => now()->format('Y-m-d'),
+            'actual_departure_time' => null,
+            'actual_arrival_time' => null,
+            'passenger_count' => 0,
+            'start_latitude' => null,
+            'start_longitude' => null,
+            'end_latitude' => null,
+            'end_longitude' => null,
+            'status' => 'loading',
+            'notes' => null,
+        ]);
+
+        return response()->json([
+            'message' => 'Trip created successfully',
+            'data' => $trip
+        ]);
+
+    }
+
     public function completeTrip(Request $request)
     {
         $user = $request->user();
@@ -277,10 +315,8 @@ class DriverController extends Controller
             ], 403);
         }
 
-        // Get today's active assignment for the driver
         $assignment = BusAssignment::where('driver_id', $user->id)
             ->where('status', 'active')
-            ->whereDate('assignment_date', today())
             ->first();
 
         if (!$assignment) {

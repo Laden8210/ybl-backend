@@ -4,8 +4,223 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use App\Models\Trip;
+use App\Models\DropPoint;
+use Illuminate\Support\Facades\DB;
 
 class ConductorController extends Controller
 {
-    //
+    public function dashboard(Request $request)
+    {
+        $user = $request->user();
+
+        if (!$user->isConductor()) {
+            return response()->json(['message' => 'Access denied. Conductor role required.'], 403);
+        }
+
+        // Find active trip where this user is the conductor
+        // Assuming BusAssignment links conductor to bus, and Trip links to BusAssignment
+        // Or if Trip has conductor_id directly (checked Trip model, it has conductor relationship via BusAssignment)
+        
+        // For simplicity, let's find the trip via the user's current assignment
+        $currentTrip = Trip::whereHas('busAssignment', function($q) use ($user) {
+                $q->where('conductor_id', $user->id);
+            })
+            ->whereIn('status', ['loading', 'in_progress'])
+            ->latest()
+            ->first();
+
+        return response()->json([
+            'message' => 'Conductor dashboard retrieved successfully',
+            'data' => [
+                'current_trip' => $currentTrip ? $this->formatTripData($currentTrip) : null,
+                'today_stats' => [
+                    'trips_count' => Trip::whereHas('busAssignment', function($q) use ($user) {
+                            $q->where('conductor_id', $user->id);
+                        })
+                        ->whereDate('trip_date', today())
+                        ->count(),
+                ]
+            ]
+        ]);
+    }
+
+    public function getCurrentTrip(Request $request)
+    {
+        $user = $request->user();
+
+        if (!$user->isConductor()) {
+            return response()->json(['message' => 'Access denied. Conductor role required.'], 403);
+        }
+
+        $currentTrip = Trip::whereHas('busAssignment', function($q) use ($user) {
+                $q->where('conductor_id', $user->id);
+            })
+            ->whereIn('status', ['loading', 'in_progress'])
+            ->latest()
+            ->first();
+
+        if (!$currentTrip) {
+            return response()->json(['message' => 'No active trip found'], 404);
+        }
+
+        return response()->json([
+            'message' => 'Current trip retrieved successfully',
+            'data' => $this->formatTripData($currentTrip)
+        ]);
+    }
+
+    public function updatePassengerCount(Request $request)
+    {
+        $user = $request->user();
+
+        if (!$user->isConductor()) {
+            return response()->json(['message' => 'Access denied. Conductor role required.'], 403);
+        }
+
+        $request->validate([
+            'passenger_count' => 'required|integer|min:0',
+        ]);
+
+        $currentTrip = Trip::whereHas('busAssignment', function($q) use ($user) {
+                $q->where('conductor_id', $user->id);
+            })
+            ->whereIn('status', ['loading', 'in_progress'])
+            ->latest()
+            ->first();
+
+        if (!$currentTrip) {
+            return response()->json(['message' => 'No active trip found'], 404);
+        }
+
+        $currentTrip->update(['passenger_count' => $request->passenger_count]);
+
+        return response()->json([
+            'message' => 'Passenger count updated successfully',
+            'data' => ['passenger_count' => $currentTrip->passenger_count]
+        ]);
+    }
+
+    public function getDropPoints(Request $request)
+    {
+        $user = $request->user();
+
+        if (!$user->isConductor()) {
+            return response()->json(['message' => 'Access denied. Conductor role required.'], 403);
+        }
+
+        $currentTrip = Trip::whereHas('busAssignment', function($q) use ($user) {
+                $q->where('conductor_id', $user->id);
+            })
+            ->whereIn('status', ['loading', 'in_progress'])
+            ->latest()
+            ->first();
+
+        if (!$currentTrip) {
+            return response()->json(['message' => 'No active trip found'], 404);
+        }
+
+        $dropPoints = $currentTrip->dropPoints()
+            ->with('passenger')
+            ->orderBy('sequence_order')
+            ->get();
+
+        return response()->json([
+            'message' => 'Drop points retrieved successfully',
+            'data' => $dropPoints
+        ]);
+    }
+
+    public function addDropPoint(Request $request)
+    {
+        $user = $request->user();
+
+        if (!$user->isConductor()) {
+            return response()->json(['message' => 'Access denied. Conductor role required.'], 403);
+        }
+
+        $request->validate([
+            'address' => 'required|string',
+            'latitude' => 'required|numeric',
+            'longitude' => 'required|numeric',
+            'passenger_name' => 'nullable|string', // Optional if added manually for a non-app user
+        ]);
+
+        $currentTrip = Trip::whereHas('busAssignment', function($q) use ($user) {
+                $q->where('conductor_id', $user->id);
+            })
+            ->whereIn('status', ['loading', 'in_progress'])
+            ->latest()
+            ->first();
+
+        if (!$currentTrip) {
+            return response()->json(['message' => 'No active trip found'], 404);
+        }
+
+        // Determine sequence order (append to end)
+        $maxSequence = $currentTrip->dropPoints()->max('sequence_order') ?? 0;
+
+        $dropPoint = DropPoint::create([
+            'trip_id' => $currentTrip->id,
+            'passenger_id' => $user->id, // Conductor creating on behalf
+            'address' => $request->address,
+            'latitude' => $request->latitude,
+            'longitude' => $request->longitude,
+            'status' => 'requested',
+            'sequence_order' => $maxSequence + 1,
+            'requested_at' => now(),
+        ]);
+
+        return response()->json([
+            'message' => 'Drop point added successfully',
+            'data' => $dropPoint
+        ]);
+    }
+
+    public function forwardDropPoint(Request $request, DropPoint $dropPoint)
+    {
+        $user = $request->user();
+
+        if (!$user->isConductor()) {
+            return response()->json(['message' => 'Access denied. Conductor role required.'], 403);
+        }
+
+        // Verify trip ownership
+        $currentTrip = Trip::whereHas('busAssignment', function($q) use ($user) {
+                $q->where('conductor_id', $user->id);
+            })
+            ->whereIn('status', ['loading', 'in_progress'])
+            ->latest()
+            ->first();
+
+        if (!$currentTrip || $dropPoint->trip_id !== $currentTrip->id) {
+            return response()->json(['message' => 'Drop point not found in current trip'], 404);
+        }
+
+        $dropPoint->update(['status' => 'forwarded']);
+
+        return response()->json([
+            'message' => 'Drop point forwarded to driver',
+            'data' => $dropPoint
+        ]);
+    }
+
+    private function formatTripData(Trip $trip)
+    {
+        return [
+            'id' => $trip->id,
+            'trip_date' => $trip->trip_date->toDateString(),
+            'status' => $trip->status,
+            'passenger_count' => $trip->passenger_count,
+            'bus' => [
+                'number' => $trip->bus->bus_number,
+                'plate' => $trip->bus->license_plate,
+            ],
+            'route' => [
+                'name' => $trip->route->route_name,
+                'start' => $trip->route->start_point,
+                'end' => $trip->route->end_point,
+            ]
+        ];
+    }
 }

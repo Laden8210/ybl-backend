@@ -177,13 +177,7 @@
                                             <span class="badge bg-light text-dark">
                                                 {{ $assignment->assignment_date->format('M d, Y') }}
                                             </span>
-                                            @if($assignment->assignment_date->isToday())
-                                                <span class="badge bg-success ms-1">Today</span>
-                                            @elseif($assignment->assignment_date->isPast())
-                                                <span class="badge bg-secondary ms-1">Past</span>
-                                            @else
-                                                <span class="badge bg-info ms-1">Upcoming</span>
-                                            @endif
+
                                         </td>
                                         <td>
                                             @php

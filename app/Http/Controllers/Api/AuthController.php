@@ -47,7 +47,9 @@ class AuthController extends Controller
     public function profile(Request $request)
     {
         return response()->json([
-            'user' => $this->getUserData($request->user()),
+            'message' => 'Profile updated successfully',
+            'data' => $this->getUserData($request->user())
+            
         ]);
     }
 
@@ -57,6 +59,85 @@ class AuthController extends Controller
 
         return response()->json([
             'message' => 'Logged out successfully'
+        ]);
+    }
+
+    public function register(Request $request)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|unique:users,email',
+            'password' => 'required|string|min:8|confirmed',
+            'phone' => 'required|string|max:20',
+            'address' => 'nullable|string',
+        ]);
+
+        $user = User::create([
+            'name' => $request->name,
+            'email' => $request->email,
+            'password' => Hash::make($request->password),
+            'phone' => $request->phone,
+            'address' => $request->address,
+            'role' => 'passenger',
+            'is_active' => true,
+        ]);
+
+        $token = $user->createToken('mobile-app')->plainTextToken;
+
+        return response()->json([
+            'message' => 'Registration successful',
+            'data' => [
+                'user' => $this->getUserData($user),
+                'token' => $token,
+            ]
+        ], 201);
+    }
+
+    public function updateProfile(Request $request)
+    {
+        $user = $request->user();
+
+        $request->validate([
+            'name' => 'sometimes|required|string|max:255',
+            'email' => 'sometimes|required|email|unique:users,email,' . $user->id,
+            'phone' => 'sometimes|required|string|max:20',
+            'address' => 'nullable|string',
+            'current_password' => 'required_with:new_password|string',
+            'new_password' => 'sometimes|required|string|min:8|confirmed',
+        ]);
+
+        // If changing password, verify current password
+        if ($request->has('new_password')) {
+            if (!Hash::check($request->current_password, $user->password)) {
+                return response()->json([
+                    'message' => 'Current password is incorrect',
+                    'errors' => [
+                        'current_password' => ['The current password is incorrect.']
+                    ]
+                ], 422);
+            }
+            $user->password = Hash::make($request->new_password);
+        }
+
+        // Update other fields
+        if ($request->has('name')) {
+            $user->name = $request->name;
+        }
+        if ($request->has('email')) {
+            $user->email = $request->email;
+        }
+        if ($request->has('phone')) {
+            $user->phone = $request->phone;
+        }
+        if ($request->has('address')) {
+            $user->address = $request->address;
+        }
+
+        $user->save();
+
+        return response()->json([
+            'message' => 'Profile updated successfully',
+            'data' => $this->getUserData($user)
         ]);
     }
 

@@ -1,6 +1,7 @@
 @php
     $navItems = [
         ['label' => 'Dashboard', 'route' => 'admin.dashboard', 'icon' => 'bi-speedometer2'],
+        ['label' => 'Trips', 'route' => 'admin.trips.index', 'icon' => 'bi-map'],
         ['label' => 'Profile', 'route' => 'admin.profile', 'icon' => 'bi-person'],
         ['label' => 'Buses', 'route' => 'admin.buses.index', 'icon' => 'bi-bus-front'],
         ['label' => 'Staff', 'route' => 'admin.staff.index', 'icon' => 'bi-people'],

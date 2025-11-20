@@ -39,39 +39,35 @@ class AssignmentController extends Controller
             'notes' => 'nullable|string|max:500',
         ]);
 
-        // Check if bus is already assigned for the same date
         $existingAssignment = BusAssignment::where('bus_id', $validated['bus_id'])
-            ->where('assignment_date', $validated['assignment_date'])
             ->where('status', 'active')
             ->first();
 
         if ($existingAssignment) {
             return redirect()->back()
-                ->with('error', 'This bus is already assigned for the selected date!')
+                ->with('error', 'This bus is already assigned to another driver or conductor!')
                 ->withInput();
         }
 
-        // Check if driver is already assigned for the same date
+
         $driverAssignment = BusAssignment::where('driver_id', $validated['driver_id'])
-            ->where('assignment_date', $validated['assignment_date'])
+
             ->where('status', 'active')
             ->first();
 
         if ($driverAssignment) {
             return redirect()->back()
-                ->with('error', 'This driver is already assigned to another bus for the selected date!')
+                ->with('error', 'This driver is already assigned to another bus or conductor!')
                 ->withInput();
         }
 
-        // Check if conductor is already assigned for the same date
         $conductorAssignment = BusAssignment::where('conductor_id', $validated['conductor_id'])
-            ->where('assignment_date', $validated['assignment_date'])
             ->where('status', 'active')
             ->first();
 
         if ($conductorAssignment) {
             return redirect()->back()
-                ->with('error', 'This conductor is already assigned to another bus for the selected date!')
+                ->with('error', 'This conductor is already assigned to another bus or driver!')
                 ->withInput();
         }
 

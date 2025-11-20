@@ -25,15 +25,15 @@
                             <i class="bi bi-bus-front"></i>
                         </div>
                         <span class="badge rounded-pill bg-success bg-opacity-10 text-success">
-                            <i class="bi bi-arrow-up-right me-1"></i>5%
+                            <i class="bi bi-arrow-up-right me-1"></i>{{ $activeBusesPercentage }}%
                         </span>
                     </div>
                     <div class="text-secondary-body small mb-1">Active Buses</div>
-                    <div class="h3 mb-2 text-heading">12</div>
+                    <div class="h3 mb-2 text-heading">{{ $activeBuses }}</div>
                     <div class="progress" style="height: 6px">
-                        <div class="progress-bar bg-success" role="progressbar" style="width: 72%"></div>
+                        <div class="progress-bar bg-success" role="progressbar" style="width: {{ $activeBusesPercentage }}%"></div>
                     </div>
-                    <div class="small text-secondary-body mt-1">8 of 12 buses on route</div>
+                    <div class="small text-secondary-body mt-1">{{ $activeBuses }} of {{ $totalBuses }} buses active</div>
                 </div>
             </div>
         </div>
@@ -51,11 +51,11 @@
                         </span>
                     </div>
                     <div class="text-secondary-body small mb-1">Registered Staff</div>
-                    <div class="h3 mb-2 text-heading">35</div>
+                    <div class="h3 mb-2 text-heading">{{ $registeredStaff }}</div>
                     <div class="progress" style="height: 6px">
                         <div class="progress-bar bg-primary" role="progressbar" style="width: 50%"></div>
                     </div>
-                    <div class="small text-secondary-body mt-1">28 staff active today</div>
+                    <div class="small text-secondary-body mt-1">{{ $activeStaffToday }} staff active today</div>
                 </div>
             </div>
         </div>
@@ -73,11 +73,11 @@
                         </span>
                     </div>
                     <div class="text-secondary-body small mb-1">Trips Today</div>
-                    <div class="h3 mb-2 text-heading">58</div>
+                    <div class="h3 mb-2 text-heading">{{ $tripsToday }}</div>
                     <div class="progress" style="height: 6px">
                         <div class="progress-bar" role="progressbar" style="width: 68%; background: #2D9C6E;"></div>
                     </div>
-                    <div class="small text-secondary-body mt-1">42 trips completed</div>
+                    <div class="small text-secondary-body mt-1">{{ $completedTripsToday }} trips completed</div>
                 </div>
             </div>
         </div>
@@ -91,15 +91,15 @@
                             <i class="bi bi-exclamation-triangle"></i>
                         </div>
                         <span class="badge rounded-pill bg-danger bg-opacity-10 text-danger">
-                            <i class="bi bi-arrow-down-right me-1"></i>-2
+                            <i class="bi bi-arrow-down-right me-1"></i>
                         </span>
                     </div>
                     <div class="text-secondary-body small mb-1">Open Alerts</div>
-                    <div class="h3 mb-2 text-heading">3</div>
+                    <div class="h3 mb-2 text-heading">{{ $openIssues }}</div>
                     <div class="progress" style="height: 6px">
                         <div class="progress-bar bg-danger" role="progressbar" style="width: 20%"></div>
                     </div>
-                    <div class="small text-secondary-body mt-1">2 resolved today</div>
+                    <div class="small text-secondary-body mt-1">{{ $resolvedIssuesToday }} resolved today</div>
                 </div>
             </div>
         </div>
@@ -160,45 +160,32 @@
                             </tr>
                         </thead>
                         <tbody>
+                            @forelse($recentTrips as $trip)
                             <tr>
-                                <td><span class="fw-semibold">08:20</span></td>
+                                <td><span class="fw-semibold">{{ $trip->created_at->format('H:i') }}</span></td>
                                 <td>
                                     <div class="d-flex align-items-center">
                                         <i class="bi bi-bus-front text-primary me-2"></i>
-                                        <span>YBL-1234</span>
+                                        <span>{{ $trip->bus->bus_number ?? 'N/A' }}</span>
                                     </div>
                                 </td>
-                                <td>YBL-23</td>
-                                <td>Michael R.</td>
-                                <td><span class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25">On time</span></td>
-
-                            </tr>
-                            <tr>
-                                <td><span class="fw-semibold">09:05</span></td>
+                                <td>{{ $trip->route->name ?? 'N/A' }}</td>
+                                <td>{{ $trip->driver->name ?? 'N/A' }}</td>
                                 <td>
-                                    <div class="d-flex align-items-center">
-                                        <i class="bi bi-bus-front text-warning me-2"></i>
-                                        <span>YBL-5678</span>
-                                    </div>
+                                    @if($trip->status == 'completed')
+                                        <span class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25">Completed</span>
+                                    @elseif($trip->status == 'in_progress')
+                                        <span class="badge bg-warning bg-opacity-10 text-warning border border-warning border-opacity-25">In Progress</span>
+                                    @else
+                                        <span class="badge bg-secondary bg-opacity-10 text-secondary border border-secondary border-opacity-25">{{ ucfirst($trip->status) }}</span>
+                                    @endif
                                 </td>
-                                <td>YBL-11</td>
-                                <td>Sarah L.</td>
-                                <td><span class="badge bg-warning bg-opacity-10 text-warning border border-warning border-opacity-25">Delayed</span></td>
-
                             </tr>
+                            @empty
                             <tr>
-                                <td><span class="fw-semibold">09:30</span></td>
-                                <td>
-                                    <div class="d-flex align-items-center">
-                                        <i class="bi bi-bus-front text-secondary me-2"></i>
-                                        <span>YBL-7788</span>
-                                    </div>
-                                </td>
-                                <td>YBL-05</td>
-                                <td>Anna K.</td>
-                                <td><span class="badge bg-secondary bg-opacity-10 text-secondary border border-secondary border-opacity-25">Arrived</span></td>
-
+                                <td colspan="5" class="text-center text-muted py-4">No recent trips found</td>
                             </tr>
+                            @endforelse
                         </tbody>
                     </table>
                 </div>
@@ -214,36 +201,29 @@
                     <span class="badge bg-danger">3</span>
                 </div>
                 <div class="card-body">
-                    <div class="alert alert-warning d-flex align-items-start" role="alert">
-                        <i class="bi bi-cone-striped me-2 mt-1"></i>
+                    @forelse($alerts as $alert)
+                    <div class="alert alert-danger d-flex align-items-start" role="alert">
+                        <i class="bi bi-exclamation-triangle me-2 mt-1"></i>
                         <div>
-                            <div class="fw-semibold">Roadworks Detour</div>
-                            <div class="small">Roadworks near Station 3 — expect 5 min delay on Route YBL-11.</div>
+                            <div class="fw-semibold">{{ ucfirst($alert->type) }} Issue</div>
+                            <div class="small">{{ Str::limit($alert->description, 50) }}</div>
+                            <div class="small text-muted mt-1">Reported by {{ $alert->driver->name ?? 'Unknown' }} • {{ $alert->created_at->diffForHumans() }}</div>
                         </div>
                     </div>
-
-                    <div class="alert alert-info d-flex align-items-start" role="alert">
-                        <i class="bi bi-info-circle me-2 mt-1"></i>
-                        <div>
-                            <div class="fw-semibold">Weather Advisory</div>
-                            <div class="small">Heavy rain expected — routes may experience delays.</div>
-                        </div>
+                    @empty
+                    <div class="text-center text-muted py-3">
+                        <i class="bi bi-check-circle me-1"></i> No open alerts
                     </div>
+                    @endforelse
 
-                    <div class="list-group list-group-flush">
+                    <div class="list-group list-group-flush mt-3">
+                        <!-- Static notices can remain or be dynamic later -->
                         <div class="list-group-item d-flex justify-content-between align-items-center px-0">
                             <div>
                                 <div class="fw-semibold small">Maintenance Window</div>
                                 <div class="small text-secondary-body">22:00–23:00 tonight</div>
                             </div>
                             <span class="badge bg-secondary">Today</span>
-                        </div>
-                        <div class="list-group-item d-flex justify-content-between align-items-center px-0">
-                            <div>
-                                <div class="fw-semibold small">Driver Training</div>
-                                <div class="small text-secondary-body">New safety protocols</div>
-                            </div>
-                            <span class="badge bg-primary">Tomorrow</span>
                         </div>
                     </div>
 
@@ -277,42 +257,22 @@
                 </div>
                 <div class="card-body p-0">
                     <div class="list-group list-group-flush">
+                        @forelse($activities as $activity)
                         <div class="list-group-item d-flex align-items-start">
                             <div class="flex-shrink-0">
-                                <div class="activity-badge bg-primary bg-opacity-10 text-primary">
-                                    <i class="bi bi-person"></i>
+                                <div class="activity-badge bg-{{ $activity['color'] }} bg-opacity-10 text-{{ $activity['color'] }}">
+                                    <i class="bi {{ $activity['icon'] }}"></i>
                                 </div>
                             </div>
                             <div class="flex-grow-1 ms-3">
-                                <div class="small fw-semibold">Conductor John</div>
-                                <div class="small text-secondary-body">Added a new drop-off point</div>
-                                <div class="small text-muted">10 minutes ago</div>
+                                <div class="small fw-semibold">{{ $activity['title'] }}</div>
+                                <div class="small text-secondary-body">{{ $activity['description'] }}</div>
+                                <div class="small text-muted">{{ $activity['time'] }}</div>
                             </div>
                         </div>
-                        <div class="list-group-item d-flex align-items-start">
-                            <div class="flex-shrink-0">
-                                <div class="activity-badge bg-success bg-opacity-10 text-success">
-                                    <i class="bi bi-play-circle"></i>
-                                </div>
-                            </div>
-                            <div class="flex-grow-1 ms-3">
-                                <div class="small fw-semibold">Bus YBL-12</div>
-                                <div class="small text-secondary-body">Started route YBL-23</div>
-                                <div class="small text-muted">45 minutes ago</div>
-                            </div>
-                        </div>
-                        <div class="list-group-item d-flex align-items-start">
-                            <div class="flex-shrink-0">
-                                <div class="activity-badge bg-info bg-opacity-10 text-info">
-                                    <i class="bi bi-check-circle"></i>
-                                </div>
-                            </div>
-                            <div class="flex-grow-1 ms-3">
-                                <div class="small fw-semibold">Driver Anna</div>
-                                <div class="small text-secondary-body">Confirmed arrival at Station 4</div>
-                                <div class="small text-muted">1 hour ago</div>
-                            </div>
-                        </div>
+                        @empty
+                        <div class="text-center text-muted py-3">No recent activity</div>
+                        @endforelse
                     </div>
                 </div>
             </div>
@@ -371,16 +331,16 @@
         const operationsChart = new Chart(ctx, {
             type: 'bar',
             data: {
-                labels: ['6:00', '8:00', '10:00', '12:00', '14:00', '16:00', '18:00'],
+                labels: @json($chartLabels),
                 datasets: [{
                     label: 'Trips Completed',
-                    data: [12, 19, 15, 25, 22, 30, 28],
+                    data: @json($chartCompletedData),
                     backgroundColor: 'rgba(45, 156, 110, 0.7)',
                     borderColor: 'rgba(45, 156, 110, 1)',
                     borderWidth: 1
                 }, {
                     label: 'Trips in Progress',
-                    data: [5, 8, 10, 7, 12, 9, 6],
+                    data: @json($chartInProgressData),
                     backgroundColor: 'rgba(255, 213, 79, 0.7)',
                     borderColor: 'rgba(255, 213, 79, 1)',
                     borderWidth: 1

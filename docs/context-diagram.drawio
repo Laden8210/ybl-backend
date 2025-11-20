@@ -1,0 +1,98 @@
+<mxfile host="65bd71144e">
+    <diagram name="Context Diagram" id="context-diagram">
+        <mxGraphModel dx="695" dy="445" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" math="0" shadow="0">
+            <root>
+                <mxCell id="0"/>
+                <mxCell id="1" parent="0"/>
+                <mxCell id="system" value="Bus Dropping Point&#xa;System&#xa;(Laravel Backend)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontStyle=1;fontSize=14;" parent="1" vertex="1">
+                    <mxGeometry x="434.5" y="313.5" width="300" height="200" as="geometry"/>
+                </mxCell>
+                <mxCell id="db" value="MySQL&#xa;Database" style="cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;fillColor=#d5e8d4;strokeColor=#82b366;" parent="1" vertex="1">
+                    <mxGeometry x="484.5" y="563.5" width="200" height="120" as="geometry"/>
+                </mxCell>
+                <mxCell id="admin" value="Admin&#xa;(Web Dashboard)" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;fillColor=#fff2cc;strokeColor=#d6b656;" parent="1" vertex="1">
+                    <mxGeometry x="90" y="300" width="30" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="supervisor" value="Supervisor&lt;br&gt;(Mobile Application)" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;fillColor=#fff2cc;strokeColor=#d6b656;" parent="1" vertex="1">
+                    <mxGeometry x="200" y="300" width="30" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="driver" value="Driver&#xa;(Mobile App)" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;fillColor=#d5e8d4;strokeColor=#82b366;" parent="1" vertex="1">
+                    <mxGeometry x="1009" y="430" width="30" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="conductor" value="Conductor&#xa;(Mobile App)" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;fillColor=#d5e8d4;strokeColor=#82b366;" parent="1" vertex="1">
+                    <mxGeometry x="970" y="270" width="30" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="conductor-label" value="Conductor" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=12;fontStyle=1" parent="1" vertex="1">
+                    <mxGeometry x="899" y="370" width="110" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="passenger" value="Passenger&#xa;(Mobile App)" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;fillColor=#d5e8d4;strokeColor=#82b366;" parent="1" vertex="1">
+                    <mxGeometry x="939" y="490" width="30" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="passenger-label" value="Passenger" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=12;fontStyle=1" parent="1" vertex="1">
+                    <mxGeometry x="799" y="370" width="110" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="maps" value="Google Maps&#xa;API" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=12;" parent="1" vertex="1">
+                    <mxGeometry x="620" y="40" width="200" height="80" as="geometry"/>
+                </mxCell>
+                <mxCell id="gps" value="GPS&#xa;Location Service" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=12;" parent="1" vertex="1">
+                    <mxGeometry x="100" y="100" width="200" height="80" as="geometry"/>
+                </mxCell>
+                <mxCell id="admin-conn" value="Manage buses, staff,&#xa;assignments, view logs" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;fontSize=10;endArrow=block;endFill=0;" parent="1" source="admin" target="system" edge="1">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="50" y="330"/>
+                            <mxPoint x="50" y="460"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="supervisor-conn" value="Monitor operations,&#xa;track buses, confirm trips" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;fontSize=10;endArrow=block;endFill=0;" parent="1" source="supervisor" target="system" edge="1">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="215" y="290"/>
+                            <mxPoint x="350" y="290"/>
+                            <mxPoint x="350" y="414"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="driver-conn" value="Start trips, update location,&#xa;confirm drop points" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;fontSize=10;endArrow=block;endFill=0;" parent="1" source="driver" target="system" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="conductor-conn" value="Add drop points,&#xa;forward requests" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;fontSize=10;endArrow=block;endFill=0;" parent="1" source="conductor" target="system" edge="1">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="790" y="300"/>
+                            <mxPoint x="790" y="380"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="passenger-conn" value="Request drop points,&#xa;track bus location" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;fontSize=10;endArrow=block;endFill=0;" parent="1" source="passenger" target="system" edge="1">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="822" y="520"/>
+                            <mxPoint x="822" y="500"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="db-conn" value="Store &amp; retrieve&#xa;all system data" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;fontSize=10;endArrow=block;endFill=0;" parent="1" source="system" target="db" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="maps-conn" value="Display maps,&#xa;routes, locations" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;fontSize=10;endArrow=block;endFill=0;" parent="1" source="system" target="maps" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="gps-conn" value="Real-time bus&#xa;location data" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;fontSize=10;endArrow=block;endFill=0;" parent="1" source="gps" target="system" edge="1">
+                    <mxGeometry x="-0.3886" relative="1" as="geometry">
+                        <mxPoint as="offset"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="driver-gps" value="GPS coordinates" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;fontSize=10;endArrow=block;endFill=0;dashed=1;dashPattern=8 8;" parent="1" source="driver" target="gps" edge="1">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="1054" y="250"/>
+                            <mxPoint x="200" y="250"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+            </root>
+        </mxGraphModel>
+    </diagram>
+</mxfile>

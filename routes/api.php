@@ -16,11 +16,13 @@ use App\Http\Controllers\Api\PassengerController;
 
 // Public routes
 Route::post('/login', [AuthController::class, 'login']);
+Route::post('/register', [AuthController::class, 'register']);
 
 // Protected routes
 Route::middleware('auth:sanctum')->group(function () {
     // Common routes
     Route::get('/profile', [AuthController::class, 'profile']);
+    Route::put('/profile', [AuthController::class, 'updateProfile']);
     Route::post('/logout', [AuthController::class, 'logout']);
 
     // Supervisor specific routes
@@ -42,9 +44,11 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/start-trip', [DriverController::class, 'startTrip']);
         Route::post('/update-trip-location', [DriverController::class, 'updateTripLocation']);
         Route::get('/today-schedule', [DriverController::class, 'getTodaySchedule']);
+        Route::post('/create-trip', [DriverController::class, 'createTrip']);
         Route::post('/complete-trip', [DriverController::class, 'completeTrip']);
         Route::get('/drop-points', [DriverController::class, 'getDropPoints']);
         Route::post('/confirm-drop-point/{dropPoint}', [DriverController::class, 'confirmDropPoint']);
+        Route::post('/issues', [App\Http\Controllers\Api\DriverIssueController::class, 'store']);
     });
 
     // Conductor specific routes
@@ -58,7 +62,7 @@ Route::middleware('auth:sanctum')->group(function () {
     });
 
 
-    
+
     // Passenger specific routes
     Route::prefix('passenger')->group(function () {
         Route::get('/routes', [PassengerController::class, 'getRoutes']);

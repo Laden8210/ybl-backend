@@ -8,6 +8,9 @@ use App\Http\Controllers\Admin\RouteController;
 use App\Http\Controllers\Admin\ScheduleController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Admin\ProfileController;
+use App\Http\Controllers\Admin\TripController;
+use App\Http\Controllers\Admin\LogController;
+use App\Http\Controllers\Admin\TrackingController;
 
 Route::get('/', function () {
     return view('landing');
@@ -20,7 +23,8 @@ Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 
 // Admin UI routes
 Route::prefix('admin')->name('admin.')->middleware(['auth','admin'])->group(function () {
-    Route::view('/', 'admin.dashboard')->name('dashboard');
+    Route::get('/', [App\Http\Controllers\Admin\DashboardController::class, 'index'])->name('dashboard');
+    Route::resource('trips', TripController::class)->only(['index', 'show']);
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile');
     Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::put('/profile/password', [ProfileController::class, 'updatePassword'])->name('profile.password');
@@ -68,9 +72,9 @@ Route::prefix('admin')->name('admin.')->middleware(['auth','admin'])->group(func
     Route::patch('/schedules/{schedule}/toggle-status', [ScheduleController::class, 'toggleStatus'])->name('schedules.toggle-status');
 
     // Logs
-    Route::view('/logs', 'admin.logs.index')->name('logs.index');
+    Route::get('/logs', [LogController::class, 'index'])->name('logs.index');
 
     // Tracking
-    Route::view('/tracking', 'admin.tracking.index')->name('tracking.index');
+    Route::get('/tracking', [TrackingController::class, 'index'])->name('tracking.index');
 });
 

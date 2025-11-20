@@ -41,22 +41,29 @@ class Bus extends Model
     }
 
     /**
-     * Get the current assignment for the bus.
+     * Get the current assignment for the bus (relationship for eager loading).
      */
     public function currentAssignment()
     {
-        return $this->assignments()
+        return $this->hasOne(BusAssignment::class)
             ->where('status', 'active')
-            ->whereDate('assignment_date', today())
-            ->first();
+            ->whereDate('assignment_date', today());
     }
 
     /**
-     * Get the trips for the bus.
+     * Get the current assignment model instance.
+     */
+    public function getCurrentAssignmentAttribute()
+    {
+        return $this->currentAssignment()->first();
+    }
+
+    /**
+     * Get the trips for the bus (through bus assignments).
      */
     public function trips()
     {
-        return $this->hasMany(Trip::class);
+        return $this->hasManyThrough(Trip::class, BusAssignment::class, 'bus_id', 'bus_assignment_id');
     }
 
     /**
@@ -107,7 +114,7 @@ class Bus extends Model
      */
     public function isAvailable(): bool
     {
-        return $this->status === 'active' && !$this->currentAssignment();
+        return $this->status === 'active' && !$this->current_assignment;
     }
 
     /**
@@ -115,7 +122,7 @@ class Bus extends Model
      */
     public function getCurrentDriverAttribute()
     {
-        return $this->currentAssignment()?->driver;
+        return $this->current_assignment?->driver;
     }
 
     /**
@@ -123,6 +130,6 @@ class Bus extends Model
      */
     public function getCurrentConductorAttribute()
     {
-        return $this->currentAssignment()?->conductor;
+        return $this->current_assignment?->conductor;
     }
 }
