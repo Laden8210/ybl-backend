@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\Trip;
 use App\Models\DropPoint;
 use Illuminate\Support\Facades\DB;
+use App\Models\Route;
 
 class ConductorController extends Controller
 {
@@ -18,11 +19,6 @@ class ConductorController extends Controller
             return response()->json(['message' => 'Access denied. Conductor role required.'], 403);
         }
 
-        // Find active trip where this user is the conductor
-        // Assuming BusAssignment links conductor to bus, and Trip links to BusAssignment
-        // Or if Trip has conductor_id directly (checked Trip model, it has conductor relationship via BusAssignment)
-        
-        // For simplicity, let's find the trip via the user's current assignment
         $currentTrip = Trip::whereHas('busAssignment', function($q) use ($user) {
                 $q->where('conductor_id', $user->id);
             })
@@ -140,40 +136,34 @@ class ConductorController extends Controller
         }
 
         $request->validate([
+            'route_id' => 'required|exists:routes,id',
             'address' => 'required|string',
             'latitude' => 'required|numeric',
             'longitude' => 'required|numeric',
-            'passenger_name' => 'nullable|string', // Optional if added manually for a non-app user
         ]);
 
-        $currentTrip = Trip::whereHas('busAssignment', function($q) use ($user) {
-                $q->where('conductor_id', $user->id);
-            })
-            ->whereIn('status', ['loading', 'in_progress'])
-            ->latest()
-            ->first();
-
-        if (!$currentTrip) {
-            return response()->json(['message' => 'No active trip found'], 404);
-        }
-
-        // Determine sequence order (append to end)
-        $maxSequence = $currentTrip->dropPoints()->max('sequence_order') ?? 0;
-
-        $dropPoint = DropPoint::create([
-            'trip_id' => $currentTrip->id,
-            'passenger_id' => $user->id, // Conductor creating on behalf
-            'address' => $request->address,
-            'latitude' => $request->latitude,
-            'longitude' => $request->longitude,
-            'status' => 'requested',
-            'sequence_order' => $maxSequence + 1,
-            'requested_at' => now(),
-        ]);
+        $route = Route::find($request->route_id);
+        
+        // Decode the waypoints JSON string to array
+        $waypoints = json_decode($route->waypoints, true) ?? [];
+        
+        // Determine next sequence number
+        $nextSequence = count($waypoints) + 1;
+        
+        // Add new waypoint
+        $waypoints[] = [
+            'name' => $request->address,
+            'latitude' => (string)$request->latitude,
+            'longitude' => (string)$request->longitude,
+            'sequence' => (string)$nextSequence,
+        ];
+        
+        // Update route with new waypoints (encode back to JSON string)
+        $route->update(['waypoints' => json_encode($waypoints)]);
 
         return response()->json([
             'message' => 'Drop point added successfully',
-            'data' => $dropPoint
+            'data' => end($waypoints) // Return the newly added waypoint
         ]);
     }
 
@@ -216,11 +206,7 @@ class ConductorController extends Controller
                 'number' => $trip->bus->bus_number,
                 'plate' => $trip->bus->license_plate,
             ],
-            'route' => [
-                'name' => $trip->route->route_name,
-                'start' => $trip->route->start_point,
-                'end' => $trip->route->end_point,
-            ]
+            'route' => $trip->route,
         ];
     }
 }

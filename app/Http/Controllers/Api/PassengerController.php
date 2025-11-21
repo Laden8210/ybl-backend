@@ -24,22 +24,14 @@ class PassengerController extends Controller
 
     public function getSchedules(Request $request)
     {
-        $query = Schedule::with(['route', 'bus'])
-            ->where('status', 'scheduled');
-
-        if ($request->has('route_id')) {
-            $query->where('route_id', $request->route_id);
-        }
-
-        // Filter by day of week
-        $today = strtolower(now()->englishDayOfWeek);
-        $query->where('day_of_week', $today);
-
-        $schedules = $query->get();
+        $schedules = Schedule::with(['route', 'bus'])
+            ->where('day_of_week', strtolower(now()->englishDayOfWeek))
+            ->whereIn('status', ['scheduled', 'in_progress', 'loading'])
+            ->get();
 
         return response()->json([
             'message' => 'Schedules retrieved successfully',
-            'data' => $schedules
+            'data' => $schedules,
         ]);
     }
 
@@ -53,8 +45,8 @@ class PassengerController extends Controller
         $locations = $activeTrips->map(function ($trip) {
             return [
                 'trip_id' => $trip->id,
-                'bus_number' => $trip->bus->bus_number,
-                'route_name' => $trip->route->route_name,
+                'bus_number' => $trip->bus?->bus_number,
+                'route_name' => $trip->route?->route_name,
                 'latitude' => $trip->latestLocation?->latitude,
                 'longitude' => $trip->latestLocation?->longitude,
                 'speed' => $trip->latestLocation?->speed,

@@ -23,7 +23,9 @@ class DriverController extends Controller
             ], 403);
         }
 
-        $currentTrip = $user->currentTrip;
+        $currentTrip = Trip::where('bus_assignment_id', $user->driverAssignments->first()->id)
+            ->whereIn('status', ['in_progress', 'loading'])
+            ->first();
 
         return response()->json([
             'message' => 'Driver dashboard retrieved successfully',
@@ -76,22 +78,18 @@ class DriverController extends Controller
         }
 
         $request->validate([
+            'trip_id' => 'required|exists:trips,id',
             'latitude' => 'required|numeric',
             'longitude' => 'required|numeric',
         ]);
 
-        $currentTrip = $user->currentTrip;
+        $currentTrip = Trip::find($request->trip_id);
+
 
         if (!$currentTrip) {
             return response()->json([
                 'message' => 'No scheduled trip found'
             ], 404);
-        }
-
-        if ($currentTrip->status !== 'scheduled') {
-            return response()->json([
-                'message' => 'Trip has already been started or completed'
-            ], 400);
         }
 
         $currentTrip->startTrip($request->latitude, $request->longitude);
@@ -113,24 +111,25 @@ class DriverController extends Controller
         }
 
         $request->validate([
+            'trip_id' => 'required|exists:trips,id',
             'latitude' => 'required|numeric',
             'longitude' => 'required|numeric',
             'speed' => 'nullable|numeric',
             'heading' => 'nullable|numeric',
         ]);
 
-        $currentTrip = $user->currentTrip;
+        $currentTrip = Trip::find($request->trip_id);
 
-        if (!$currentTrip || $currentTrip->status !== 'in_progress') {
+        if (!$currentTrip) {
             return response()->json([
-                'message' => 'No active trip in progress'
+                'message' => 'No scheduled trip found'
             ], 404);
         }
 
         // Record bus location
         BusLocation::create([
             'trip_id' => $currentTrip->id,
-            'bus_id' => $currentTrip->bus_id,
+            'bus_id' => $currentTrip->schedule->bus_id,
             'latitude' => $request->latitude,
             'longitude' => $request->longitude,
             'speed' => $request->speed,
@@ -174,6 +173,11 @@ class DriverController extends Controller
             'notes' => null,
         ]);
 
+        $updateScheduleStatus = Schedule::find($request->schedule_id);
+        $updateScheduleStatus->update([
+            'status' => 'in_progress',
+        ]);
+
         return response()->json([
             'message' => 'Trip created successfully',
             'data' => $trip
@@ -192,11 +196,12 @@ class DriverController extends Controller
         }
 
         $request->validate([
+            'trip_id' => 'required|exists:trips,id',
             'latitude' => 'required|numeric',
             'longitude' => 'required|numeric',
         ]);
 
-        $currentTrip = $user->currentTrip;
+        $currentTrip = Trip::find($request->trip_id);
 
         if (!$currentTrip || $currentTrip->status !== 'in_progress') {
             return response()->json([
@@ -205,6 +210,11 @@ class DriverController extends Controller
         }
 
         $currentTrip->completeTrip($request->latitude, $request->longitude);
+
+        $updateScheduleStatus = Schedule::find($currentTrip->schedule_id);
+        $updateScheduleStatus->update([
+            'status' => 'completed',
+        ]);
 
         return response()->json([
             'message' => 'Trip completed successfully',
@@ -302,6 +312,13 @@ class DriverController extends Controller
                 'route_name' => $trip->schedule->route->route_name,
                 'start_point' => $trip->schedule->route->start_point,
                 'end_point' => $trip->schedule->route->end_point,
+                'start_time' => $trip->schedule->start_time,
+                'end_time' => $trip->schedule->end_time,
+                'start_latitude' => $trip->schedule->route->start_latitude,
+                'start_longitude' => $trip->schedule->route->start_longitude,
+                'end_latitude' => $trip->schedule->route->end_latitude,
+                'end_longitude' => $trip->schedule->route->end_longitude,
+                'waypoints' => $trip->schedule->route->waypoints,
             ],
         ];
     }
@@ -331,7 +348,6 @@ class DriverController extends Controller
 
         $schedule = Schedule::where('bus_id', $assignment->bus_id)
             ->where('day_of_week', $dayOfWeek)
-            ->where('status', 'scheduled')
             ->where(function ($query) use ($today) {
                 $query->where('is_recurring', true)
                     ->orWhereDate('effective_date', '<=', $today)
@@ -341,7 +357,7 @@ class DriverController extends Controller
                     });
             })
             ->with(['bus', 'route'])
-            ->first();
+            ->get();
 
         if (!$schedule) {
             return response()->json([

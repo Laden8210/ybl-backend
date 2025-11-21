@@ -42,7 +42,7 @@ class StaffController extends Controller
             'phone' => 'nullable|string|max:20',
             'address' => 'nullable|string|max:500',
             'license_number' => 'required_if:role,driver|nullable|string|max:50|unique:users',
-            'employee_id' => 'required|string|max:50|unique:users',
+            'employee_id' => 'required|string|max:20|unique:users',
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
         ]);
 

@@ -37,7 +37,6 @@ class SupervisorController extends Controller
         // Get today's schedules
         $todaySchedules = Schedule::with(['bus', 'route'])
             ->where('day_of_week', strtolower($today->englishDayOfWeek))
-            ->where('status', 'scheduled')
             ->get();
 
         // Get active buses with their latest locations
@@ -74,9 +73,15 @@ class SupervisorController extends Controller
             ], 403);
         }
 
-        $buses = Bus::with(['currentAssignment.driver', 'currentAssignment.conductor', 'latestLocation'])
-            ->orderBy('bus_number')
-            ->get();
+        $query = Bus::with(['currentAssignment.driver', 'currentAssignment.conductor', 'latestLocation'])
+            ->orderBy('bus_number');
+
+        // Filter for only available (unassigned) buses if requested
+        if ($request->has('available_only') && $request->available_only) {
+            $query->whereDoesntHave('currentAssignment');
+        }
+
+        $buses = $query->get();
 
         return response()->json([
             'message' => 'Buses retrieved successfully',
@@ -88,6 +93,7 @@ class SupervisorController extends Controller
                     'model' => $bus->model,
                     'capacity' => $bus->capacity,
                     'status' => $bus->status,
+                    'is_assigned' => $bus->currentAssignment !== null,
                     'current_assignment' => $bus->currentAssignment ? [
                         'driver' => $bus->currentAssignment->driver ? [
                             'id' => $bus->currentAssignment->driver->id,
@@ -124,7 +130,7 @@ class SupervisorController extends Controller
         }
 
         $schedules = Schedule::with(['bus', 'route'])
-            ->where('status', 'scheduled')
+
             ->orderBy('day_of_week')
             ->orderBy('departure_time')
             ->get();

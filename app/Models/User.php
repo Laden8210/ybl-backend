@@ -142,7 +142,6 @@ class User extends Authenticatable
     {
         return $this->driverAssignments()
             ->where('status', 'active')
-            ->whereDate('assignment_date', today())
             ->first();
     }
 
@@ -250,11 +249,11 @@ class User extends Authenticatable
 
     public function getCurrentTripAttribute()
     {
-        $bus = $this->current_bus;
+        $bus = $this->current_assignment;
         if ($bus) {
             return Trip::where('bus_assignment_id', $bus->id)
-                ->whereDate('trip_date', today())
-                ->whereIn('status', ['scheduled', 'in_progress'])
+
+                ->whereIn('status', ['scheduled', 'in_progress', 'loading'])
                 ->first();
         }
 

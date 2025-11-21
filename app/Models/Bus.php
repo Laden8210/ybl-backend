@@ -46,8 +46,7 @@ class Bus extends Model
     public function currentAssignment()
     {
         return $this->hasOne(BusAssignment::class)
-            ->where('status', 'active')
-            ->whereDate('assignment_date', today());
+            ->where('status', 'active');
     }
 
     /**

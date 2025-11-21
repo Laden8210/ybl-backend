@@ -73,36 +73,7 @@
                 </div>
             </div>
 
-            <!-- Drop Points / Locations -->
-            <div class="card border-0 shadow-sm">
-                <div class="card-header bg-white py-3">
-                    <h6 class="mb-0 fw-bold">Drop Points & Locations</h6>
-                </div>
-                <div class="card-body">
-                    @if($trip->dropPoints->count() > 0)
-                        <ul class="list-group list-group-flush">
-                            @foreach($trip->dropPoints as $point)
-                                <li class="list-group-item px-0 py-3">
-                                    <div class="d-flex justify-content-between align-items-center">
-                                        <div>
-                                            <div class="fw-medium">{{ $point->location_name }}</div>
-                                            <div class="small text-muted">{{ $point->arrival_time ? $point->arrival_time->format('h:i A') : 'Pending' }}</div>
-                                        </div>
-                                        <span class="badge bg-{{ $point->status === 'completed' ? 'success' : 'secondary' }} bg-opacity-10 text-{{ $point->status === 'completed' ? 'success' : 'secondary' }}">
-                                            {{ ucfirst($point->status) }}
-                                        </span>
-                                    </div>
-                                </li>
-                            @endforeach
-                        </ul>
-                    @else
-                        <div class="text-center py-4 text-muted">
-                            <i class="bi bi-geo-alt display-6 d-block mb-2"></i>
-                            No drop points recorded.
-                        </div>
-                    @endif
-                </div>
-            </div>
+ 
         </div>
 
         <!-- Sidebar Info -->
@@ -128,10 +99,7 @@
                                 <span class="text-muted">Capacity:</span>
                                 <span class="fw-medium">{{ $trip->bus->capacity }}</span>
                             </div>
-                            <div class="col-6">
-                                <span class="text-muted">Type:</span>
-                                <span class="fw-medium">{{ $trip->bus->type }}</span>
-                            </div>
+                   
                         </div>
                     @else
                         <div class="text-muted">No bus assigned.</div>
@@ -155,9 +123,7 @@
                                 <div class="small text-muted">{{ $trip->driver->email }}</div>
                             </div>
                         </div>
-                        <div class="d-grid">
-                            <a href="#" class="btn btn-sm btn-outline-primary">View Profile</a>
-                        </div>
+                       
                     @else
                         <div class="text-muted">No driver assigned.</div>
                     @endif
