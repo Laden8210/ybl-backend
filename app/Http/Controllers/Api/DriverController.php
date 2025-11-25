@@ -25,7 +25,7 @@ class DriverController extends Controller
 
         $currentTrip = Trip::where('bus_assignment_id', $user->driverAssignments->first()->id)
             ->whereIn('status', ['in_progress', 'loading'])
-            ->first();
+            ->first();  
 
         return response()->json([
             'message' => 'Driver dashboard retrieved successfully',
