@@ -169,7 +169,7 @@ class DriverController extends Controller
             return response()->json([
                 'message' => 'Bus is already assigned to another trip',
                 'data' => $existingTrip
-            ], 400);
+            ]);
         }
 
         $trip = Trip::create([
