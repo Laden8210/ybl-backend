@@ -160,6 +160,18 @@ class DriverController extends Controller
 
         $busAssignment = BusAssignment::where('bus_id', $request->bus_id)->first();
 
+        // check first if there is exist and not yet completed trip
+        $existingTrip = Trip::where('bus_assignment_id', $busAssignment->id)
+            ->where('status', '!=', 'completed')
+            ->first();
+
+        if ($existingTrip) {
+            return response()->json([
+                'message' => 'Bus is already assigned to another trip',
+                'data' => $existingTrip
+            ], 400);
+        }
+
         $trip = Trip::create([
             'schedule_id' => $request->schedule_id,
             'bus_assignment_id' => $busAssignment->id,
