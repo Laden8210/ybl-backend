@@ -158,9 +158,11 @@ class DriverController extends Controller
             'bus_id' => 'required|exists:buses,id',
         ]);
 
+        $busAssignment = BusAssignment::where('bus_id', $request->bus_id)->first();
+
         $trip = Trip::create([
             'schedule_id' => $request->schedule_id,
-            'bus_assignment_id' => $request->bus_id,
+            'bus_assignment_id' => $busAssignment->id,
             'trip_date' => now()->format('Y-m-d'),
             'actual_departure_time' => null,
             'actual_arrival_time' => null,
