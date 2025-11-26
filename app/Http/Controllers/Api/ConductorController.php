@@ -22,6 +22,7 @@ class ConductorController extends Controller
         $currentTrip = Trip::whereHas('busAssignment', function($q) use ($user) {
                 $q->where('conductor_id', $user->id);
             })
+            ->with(['bus', 'route'])
             ->whereIn('status', ['loading', 'in_progress'])
             ->latest()
             ->first();
@@ -52,6 +53,7 @@ class ConductorController extends Controller
         $currentTrip = Trip::whereHas('busAssignment', function($q) use ($user) {
                 $q->where('conductor_id', $user->id);
             })
+            ->with(['bus', 'route'])
             ->whereIn('status', ['loading', 'in_progress'])
             ->latest()
             ->first();
@@ -81,6 +83,7 @@ class ConductorController extends Controller
         $currentTrip = Trip::whereHas('busAssignment', function($q) use ($user) {
                 $q->where('conductor_id', $user->id);
             })
+            ->with(['bus', 'route'])
             ->whereIn('status', ['loading', 'in_progress'])
             ->latest()
             ->first();
@@ -108,6 +111,7 @@ class ConductorController extends Controller
         $currentTrip = Trip::whereHas('busAssignment', function($q) use ($user) {
                 $q->where('conductor_id', $user->id);
             })
+            ->with(['bus', 'route'])
             ->whereIn('status', ['loading', 'in_progress'])
             ->latest()
             ->first();
@@ -179,6 +183,7 @@ class ConductorController extends Controller
         $currentTrip = Trip::whereHas('busAssignment', function($q) use ($user) {
                 $q->where('conductor_id', $user->id);
             })
+            ->with(['bus', 'route'])
             ->whereIn('status', ['loading', 'in_progress'])
             ->latest()
             ->first();
@@ -203,8 +208,8 @@ class ConductorController extends Controller
             'status' => $trip->status,
             'passenger_count' => $trip->passenger_count,
             'bus' => [
-                'number' => $trip->bus->bus_number,
-                'plate' => $trip->bus->license_plate,
+                'number' => $trip->bus?->bus_number,
+                'plate' => $trip->bus?->license_plate,
             ],
             'route' => $trip->route,
         ];
