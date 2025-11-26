@@ -37,7 +37,7 @@
                         @forelse($activeTrips as $trip)
                             <a href="#" class="list-group-item list-group-item-action p-3" onclick="focusBus({{ $trip->latestLocation->latitude ?? 0 }}, {{ $trip->latestLocation->longitude ?? 0 }})">
                                 <div class="d-flex justify-content-between align-items-start mb-1">
-                                    <div class="fw-bold">Bus {{ $trip->bus->bus_number }}</div>
+                                    <div class="fw-bold">Bus {{ $trip->bus?->bus_number ?? 'N/A' }}</div>
                                     <span class="badge bg-success bg-opacity-10 text-success">Active</span>
                                 </div>
                                 <div class="small text-muted mb-2">
@@ -92,7 +92,7 @@
                         L.marker([lat, lng], {icon: busIcon})
                             .addTo(map)
                             .bindPopup(`
-                                <strong>Bus ${trip.bus.bus_number}</strong><br>
+                                <strong>Bus ${trip.bus ? trip.bus.bus_number : 'N/A'}</strong><br>
                                 Route: ${trip.route ? trip.route.name : 'N/A'}<br>
                                 Speed: ${trip.latest_location.speed} km/h
                             `);

@@ -56,12 +56,26 @@ class Trip extends Model
      */
     public function bus()
     {
-        return $this->hasOneThrough(Bus::class, BusAssignment::class, 'bus_id', 'id', 'bus_assignment_id', 'id');
+        return $this->hasOneThrough(
+            Bus::class,           // Final model
+            BusAssignment::class, // Intermediate model
+            'id',                 // Foreign key on BusAssignment table
+            'id',                 // Foreign key on Bus table
+            'bus_assignment_id',  // Local key on Trip table
+            'bus_id'              // Local key on BusAssignment table
+        );
     }
 
     public function driver()
     {
-        return $this->hasOneThrough(User::class, BusAssignment::class, 'driver_id', 'id', 'bus_assignment_id', 'id');
+        return $this->hasOneThrough(
+            User::class,          // Final model
+            BusAssignment::class, // Intermediate model
+            'id',                 // Foreign key on BusAssignment table
+            'id',                 // Foreign key on User table
+            'bus_assignment_id',  // Local key on Trip table
+            'driver_id'           // Local key on BusAssignment table
+        );
     }
 
     public function route()
